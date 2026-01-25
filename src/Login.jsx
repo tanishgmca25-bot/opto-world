@@ -44,9 +44,6 @@ const Login = () => {
                     </p>
                 </CardHeader>
                 <CardContent>
-                    <div className="bg-blue-50 border border-blue-100 rounded-md p-3 mb-6 text-sm text-blue-800 text-center">
-                        <p><strong>Admin Login:</strong> admin@optoworld.com / admin123</p>
-                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
