@@ -5,7 +5,7 @@ import { Checkbox } from './components/ui/checkbox';
 import { Label } from './components/ui/label';
 import { Slider } from './components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
-import { mockProducts, brands, colors, materials, frameTypes } from './mock/mockData';
+import { mockProducts, brands, colors, frameTypes } from './mock/mockData';
 import { Filter, X } from 'lucide-react';
 
 const Products = () => {
@@ -13,7 +13,6 @@ const Products = () => {
     const [priceRange, setPriceRange] = useState([0, 5000]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
-    const [selectedMaterials, setSelectedMaterials] = useState([]);
     const [selectedFrameTypes, setSelectedFrameTypes] = useState([]);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [sortBy, setSortBy] = useState('featured');
@@ -32,10 +31,7 @@ const Products = () => {
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
         const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
         const matchesColor = selectedColors.length === 0 || selectedColors.includes(product.color);
-        const matchesMaterial = selectedMaterials.length === 0 || selectedMaterials.includes(product.material);
-        const matchesFrameType = selectedFrameTypes.length === 0 || selectedFrameTypes.includes(product.frameType);
-
-        return matchesPrice && matchesBrand && matchesColor && matchesMaterial && matchesFrameType;
+        return matchesPrice && matchesBrand && matchesColor && matchesFrameType;
     });
 
     // Sort products
@@ -194,7 +190,6 @@ const Products = () => {
                                         setPriceRange([0, 10000]);
                                         setSelectedBrands([]);
                                         setSelectedColors([]);
-                                        setSelectedMaterials([]);
                                         setSelectedFrameTypes([]);
                                     }}
                                     className="mt-2 text-blue-600"
