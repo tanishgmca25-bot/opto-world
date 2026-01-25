@@ -8,48 +8,48 @@ import { Mail, Phone, MapPin, Send } from 'lucide-react';
 
 const Contact = () => {
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-2xl mx-auto mb-12">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h1>
-                    <p className="text-gray-600">
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center max-w-xl mx-auto mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-3">Get in Touch</h1>
+                    <p className="text-gray-600 text-sm">
                         Have questions about our products or services? We're here to help.
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid md:grid-cols-3 gap-6">
                     {/* Contact Info */}
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         <Card className="border-none shadow-sm h-full">
-                            <CardContent className="p-8 space-y-8">
-                                <div className="flex items-start space-x-4">
-                                    <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
-                                        <Phone className="h-6 w-6" />
+                            <CardContent className="p-6 space-y-6">
+                                <div className="flex items-start space-x-3">
+                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
+                                        <Phone className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                                        <p className="text-gray-600 text-sm">Mon-Fri from 9am to 6pm</p>
-                                        <p className="font-medium text-blue-600 mt-1">+91 98765 43210</p>
+                                        <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Phone</h3>
+                                        <p className="text-gray-600 text-xs">Mon-Fri from 9am to 6pm</p>
+                                        <p className="font-medium text-blue-600 mt-0.5 text-sm">+91 98765 43210</p>
                                     </div>
                                 </div>
-                                <div className="flex items-start space-x-4">
-                                    <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
-                                        <Mail className="h-6 w-6" />
+                                <div className="flex items-start space-x-3">
+                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
+                                        <Mail className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                                        <p className="text-gray-600 text-sm">Our friendly team is here to help.</p>
-                                        <p className="font-medium text-blue-600 mt-1">support@optoworld.com</p>
+                                        <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Email</h3>
+                                        <p className="text-gray-600 text-xs">Our friendly team is here to help.</p>
+                                        <p className="font-medium text-blue-600 mt-0.5 text-sm">support@optoworld.com</p>
                                     </div>
                                 </div>
-                                <div className="flex items-start space-x-4">
-                                    <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
-                                        <MapPin className="h-6 w-6" />
+                                <div className="flex items-start space-x-3">
+                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
+                                        <MapPin className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-900 mb-1">Office</h3>
-                                        <p className="text-gray-600 text-sm">Come say hello at our office HQ.</p>
-                                        <p className="font-medium text-gray-900 mt-1">
+                                        <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Office</h3>
+                                        <p className="text-gray-600 text-xs">Come say hello at our office HQ.</p>
+                                        <p className="font-medium text-gray-900 mt-0.5 text-sm">
                                             123 Vision Street, Mumbai, Maharashtra 400001
                                         </p>
                                     </div>
@@ -61,34 +61,34 @@ const Contact = () => {
                     {/* Contact Form */}
                     <div className="md:col-span-2">
                         <Card className="border-none shadow-sm">
-                            <CardContent className="p-8">
-                                <form className="space-y-6">
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
+                            <CardContent className="p-6">
+                                <form className="space-y-4">
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
                                             <Label htmlFor="firstName">First name</Label>
-                                            <Input id="firstName" placeholder="John" />
+                                            <Input id="firstName" placeholder="John" className="h-9" />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <Label htmlFor="lastName">Last name</Label>
-                                            <Input id="lastName" placeholder="Doe" />
+                                            <Input id="lastName" placeholder="Doe" className="h-9" />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-1.5">
                                         <Label htmlFor="email">Email</Label>
-                                        <Input id="email" type="email" placeholder="john@example.com" />
+                                        <Input id="email" type="email" placeholder="john@example.com" className="h-9" />
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-1.5">
                                         <Label htmlFor="message">Message</Label>
                                         <Textarea
                                             id="message"
                                             placeholder="How can we help you?"
-                                            className="min-h-[150px]"
+                                            className="min-h-[120px]"
                                         />
                                     </div>
 
-                                    <Button type="submit" className="w-full md:w-auto">
+                                    <Button type="submit" className="w-full md:w-auto h-9 px-6 text-sm">
                                         <Send className="mr-2 h-4 w-4" />
                                         Send Message
                                     </Button>

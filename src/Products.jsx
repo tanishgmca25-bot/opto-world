@@ -44,17 +44,17 @@ const Products = () => {
     });
 
     return (
-        <div className="bg-gray-50 min-h-screen pb-20">
+        <div className="bg-gray-50 min-h-screen pb-12">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 mb-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 text-center md:text-left">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Our Collection</h1>
-                    <p className="text-gray-600">Explore our wide range of premium eyewear</p>
+            <div className="bg-white border-b border-gray-200 mb-6">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 text-center md:text-left">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Our Collection</h1>
+                    <p className="text-gray-600 text-sm">Explore our wide range of premium eyewear</p>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row gap-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row gap-6">
                     {/* Mobile Filter Button */}
                     <div className="md:hidden">
                         <Button onClick={() => setShowMobileFilters(true)} className="w-full flex items-center justify-center">

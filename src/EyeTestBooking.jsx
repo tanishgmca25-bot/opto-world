@@ -9,29 +9,29 @@ import { Calendar, Clock } from 'lucide-react';
 
 const EyeTestBooking = () => {
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">Book Your Eye Test</h1>
-                    <p className="text-gray-600">
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Book Your Eye Test</h1>
+                    <p className="text-gray-600 text-sm">
                         Professional eye examination by certified optometrists.
                     </p>
                 </div>
 
-                <div className="grid gap-6">
+                <div className="grid gap-5">
                     <Card className="border-none shadow-md">
-                        <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-                            <CardTitle className="flex items-center text-lg">
-                                <Calendar className="mr-2 h-5 w-5 text-blue-600" />
+                        <CardHeader className="border-b border-gray-100 bg-gray-50/50 py-4">
+                            <CardTitle className="flex items-center text-base font-semibold">
+                                <Calendar className="mr-2 h-4 w-4 text-blue-600" />
                                 Appointment Details
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label>Preferred Location</Label>
+                        <CardContent className="p-5 space-y-5">
+                            <div className="grid md:grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs">Preferred Location</Label>
                                     <Select>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="h-9">
                                             <SelectValue placeholder="Select Clinic" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -41,10 +41,10 @@ const EyeTestBooking = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Test Type</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs">Test Type</Label>
                                     <Select>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="h-9">
                                             <SelectValue placeholder="Select Service" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -56,20 +56,20 @@ const EyeTestBooking = () => {
                                 </div>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label>Preferred Date</Label>
+                            <div className="grid md:grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs">Preferred Date</Label>
                                     <div className="relative">
-                                        <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                        <Input type="date" className="pl-10" />
+                                        <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                        <Input type="date" className="pl-9 h-9" />
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Preferred Time</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs">Preferred Time</Label>
                                     <div className="relative">
-                                        <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                        <Clock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                                         <Select>
-                                            <SelectTrigger className="pl-10">
+                                            <SelectTrigger className="pl-9 h-9">
                                                 <SelectValue placeholder="Select Time" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -88,34 +88,35 @@ const EyeTestBooking = () => {
                     </Card>
 
                     <Card className="border-none shadow-md">
-                        <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-                            <CardTitle className="text-lg">Personal Information</CardTitle>
+                        <CardHeader className="border-b border-gray-100 bg-gray-50/50 py-4">
+                            <CardTitle className="text-base font-semibold">Personal Information</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Full Name</Label>
-                                    <Input id="name" placeholder="Enter your name" />
+                        <CardContent className="p-5 space-y-5">
+                            <div className="grid md:grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="name" className="text-xs">Full Name</Label>
+                                    <Input id="name" placeholder="Enter your name" className="h-9" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="phone">Phone Number</Label>
-                                    <Input id="phone" placeholder="+91 98765 43210" />
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="phone" className="text-xs">Phone Number</Label>
+                                    <Input id="phone" placeholder="+91 98765 43210" className="h-9" />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="notes">Additional Notes (Optional)</Label>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="notes" className="text-xs">Additional Notes (Optional)</Label>
                                 <Textarea
                                     id="notes"
                                     placeholder="Any specific concerns or medical history..."
+                                    className="min-h-[80px]"
                                 />
                             </div>
 
-                            <div className="pt-4">
-                                <Button size="lg" className="w-full md:w-auto min-w-[200px]">
+                            <div className="pt-2">
+                                <Button size="lg" className="w-full md:w-auto min-w-[180px] h-10 text-sm">
                                     Confirm Booking
                                 </Button>
-                                <p className="text-sm text-gray-500 mt-4 text-center md:text-left">
+                                <p className="text-xs text-gray-500 mt-3 text-center md:text-left">
                                     By booking, you agree to receive appointment reminders via SMS/Email.
                                 </p>
                             </div>
