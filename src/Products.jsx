@@ -31,6 +31,7 @@ const Products = () => {
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
         const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
         const matchesColor = selectedColors.length === 0 || selectedColors.includes(product.color);
+        const matchesFrameType = selectedFrameTypes.length === 0 || selectedFrameTypes.includes(product.frameType);
         return matchesPrice && matchesBrand && matchesColor && matchesFrameType;
     });
 
