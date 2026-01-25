@@ -24,13 +24,15 @@ export const CardHeader = React.forwardRef(({ className = '', ...props }, ref) =
 
 CardHeader.displayName = 'CardHeader';
 
-export const CardTitle = React.forwardRef(({ className = '', ...props }, ref) => {
+export const CardTitle = React.forwardRef(({ className = '', children, ...props }, ref) => {
     return (
         <h3
             ref={ref}
             className={`text-2xl font-semibold leading-none tracking-tight ${className}`}
             {...props}
-        />
+        >
+            {children}
+        </h3>
     );
 });
 

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, Search, Heart, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Eye, Search, Heart, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navigate = useNavigate();
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">

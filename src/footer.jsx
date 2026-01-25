@@ -17,13 +17,13 @@ const Footer = () => {
                             Your trusted partner for premium eyewear. Quality vision care solutions for everyone.
                         </p>
                         <div className="flex space-x-4">
-                            <a href="#" className="hover:text-blue-500 transition-colors">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
                                 <Facebook className="h-5 w-5" />
                             </a>
-                            <a href="#" className="hover:text-blue-500 transition-colors">
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
                                 <Instagram className="h-5 w-5" />
                             </a>
-                            <a href="#" className="hover:text-blue-500 transition-colors">
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">
                                 <Twitter className="h-5 w-5" />
                             </a>
                         </div>
@@ -61,24 +61,24 @@ const Footer = () => {
                         <h3 className="text-white font-semibold mb-4">Customer Service</h3>
                         <ul className="space-y-2 text-sm">
                             <li>
-                                <a href="#" className="hover:text-blue-500 transition-colors">
+                                <Link to="/shipping" className="hover:text-blue-500 transition-colors">
                                     Shipping & Delivery
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-blue-500 transition-colors">
+                                <Link to="/returns" className="hover:text-blue-500 transition-colors">
                                     Returns & Exchanges
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-blue-500 transition-colors">
+                                <Link to="/faqs" className="hover:text-blue-500 transition-colors">
                                     FAQs
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="hover:text-blue-500 transition-colors">
+                                <Link to="/privacy" className="hover:text-blue-500 transition-colors">
                                     Privacy Policy
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
