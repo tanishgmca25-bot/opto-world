@@ -17,51 +17,49 @@ const Contact = () => {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-3 gap-6 items-start">
                     {/* Contact Info */}
-                    <div className="space-y-4">
-                        <Card className="border-none shadow-sm h-full">
-                            <CardContent className="p-6 space-y-6">
-                                <div className="flex items-start space-x-3">
-                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
-                                        <Phone className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Phone</h3>
-                                        <p className="text-gray-600 text-xs">Mon-Fri from 9am to 6pm</p>
-                                        <p className="font-medium text-blue-600 mt-0.5 text-sm">+91 98765 43210</p>
-                                    </div>
+                    <Card className="shadow-sm bg-white">
+                        <CardContent className="p-6 pt-6 space-y-6">
+                            <div className="flex items-start space-x-3">
+                                <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
+                                    <Phone className="h-5 w-5" />
                                 </div>
-                                <div className="flex items-start space-x-3">
-                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
-                                        <Mail className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Email</h3>
-                                        <p className="text-gray-600 text-xs">Our friendly team is here to help.</p>
-                                        <p className="font-medium text-blue-600 mt-0.5 text-sm">support@optoworld.com</p>
-                                    </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Phone</h3>
+                                    <p className="text-gray-600 text-xs">Mon-Fri from 9am to 6pm</p>
+                                    <p className="font-medium text-blue-600 mt-0.5 text-sm">+91 98765 43210</p>
                                 </div>
-                                <div className="flex items-start space-x-3">
-                                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
-                                        <MapPin className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Office</h3>
-                                        <p className="text-gray-600 text-xs">Come say hello at our office HQ.</p>
-                                        <p className="font-medium text-gray-900 mt-0.5 text-sm">
-                                            123 Vision Street, Mumbai, Maharashtra 400001
-                                        </p>
-                                    </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                                <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
+                                    <Mail className="h-5 w-5" />
                                 </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Email</h3>
+                                    <p className="text-gray-600 text-xs">Our friendly team is here to help.</p>
+                                    <p className="font-medium text-blue-600 mt-0.5 text-sm">support@optoworld.com</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                                <div className="bg-blue-100 p-2 rounded-lg text-blue-600 flex-shrink-0">
+                                    <MapPin className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 mb-0.5 text-sm">Office</h3>
+                                    <p className="text-gray-600 text-xs">Come say hello at our office HQ.</p>
+                                    <p className="font-medium text-gray-900 mt-0.5 text-sm">
+                                        202, Dharani Complex, BSK 1st Stage, 80 Feet Rd, Srinivasnagar, Banashankari, Bengaluru, Karnataka 560050
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Contact Form */}
                     <div className="md:col-span-2">
-                        <Card className="border-none shadow-sm">
-                            <CardContent className="p-6">
+                        <Card className="shadow-sm bg-white">
+                            <CardContent className="p-6 pt-6">
                                 <form className="space-y-4">
                                     <div className="grid md:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
