@@ -5,23 +5,25 @@ import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Eye, Mail, Lock, User } from 'lucide-react';
+import { authAPI } from './services/api';
 
 const SignUp = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        phone: ''
+        confirmPassword: ''
     });
     const [error, setError] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError(''); // Clear error when user types
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -41,30 +43,36 @@ const SignUp = () => {
             return;
         }
 
-        // Mock signup - Store in localStorage
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userExists = users.find(u => u.email === formData.email);
+        setLoading(true);
 
-        if (userExists) {
-            setError('Email already registered');
-            return;
+        try {
+            const response = await authAPI.signup(
+                formData.name,
+                formData.email,
+                formData.password,
+                formData.confirmPassword
+            );
+
+            if (response.success) {
+                // Store token and user info
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('userRole', response.user.role);
+                localStorage.setItem('userName', response.user.name);
+                localStorage.setItem('userEmail', response.user.email);
+
+                // Dispatch event to update header
+                window.dispatchEvent(new Event('loginStatusChanged'));
+
+                alert('Account created successfully!');
+                navigate('/');
+            } else {
+                setError(response.message || 'Registration failed');
+            }
+        } catch (error) {
+            setError('Error: ' + error.message);
+        } finally {
+            setLoading(false);
         }
-
-        const newUser = {
-            id: Date.now().toString(),
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            password: formData.password,
-            role: 'user',
-            createdAt: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-
-        alert('Account created successfully! Please login.');
-        navigate('/login');
     };
 
     return (
@@ -82,7 +90,7 @@ const SignUp = () => {
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
                                 {error}
                             </div>
                         )}
@@ -99,6 +107,7 @@ const SignUp = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     className="pl-10"
+                                    required
                                 />
                             </div>
                         </div>
@@ -115,20 +124,9 @@ const SignUp = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     className="pl-10"
+                                    required
                                 />
                             </div>
-                        </div>
-
-                        <div>
-                            <Label htmlFor="phone">Phone Number</Label>
-                            <Input
-                                id="phone"
-                                name="phone"
-                                type="tel"
-                                placeholder="+91 9876543210"
-                                value={formData.phone}
-                                onChange={handleChange}
-                            />
                         </div>
 
                         <div>
@@ -143,8 +141,10 @@ const SignUp = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     className="pl-10"
+                                    required
                                 />
                             </div>
+                            <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
                         </div>
 
                         <div>
@@ -159,12 +159,18 @@ const SignUp = () => {
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                     className="pl-10"
+                                    required
                                 />
                             </div>
                         </div>
 
-                        <Button type="submit" className="w-full" size="lg">
-                            Sign Up
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            size="lg"
+                            disabled={loading}
+                        >
+                            {loading ? 'Creating Account...' : 'Sign Up'}
                         </Button>
 
                         <p className="text-center text-sm text-gray-600">

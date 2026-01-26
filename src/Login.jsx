@@ -5,9 +5,11 @@ import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Eye, Mail, Lock } from 'lucide-react';
+import { authAPI } from './services/api';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -17,17 +19,38 @@ const Login = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Mock login
-        if (formData.email === 'admin@optoworld.com' && formData.password === 'admin123') {
-            localStorage.setItem('userRole', 'admin');
-            alert('Admin Login Successful!');
-            navigate('/admin');
-        } else {
-            localStorage.setItem('userRole', 'user');
-            alert('Login Successful!');
-            navigate('/');
+        setLoading(true);
+
+        try {
+            const response = await authAPI.login(formData.email, formData.password);
+
+            if (response.success) {
+                // Store token and user info
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('userRole', response.user.role);
+                localStorage.setItem('userName', response.user.name);
+                localStorage.setItem('userEmail', response.user.email);
+
+                // Dispatch event to update header
+                window.dispatchEvent(new Event('loginStatusChanged'));
+
+                alert('Login Successful!');
+
+                // Navigate based on role
+                if (response.user.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/');
+                }
+            } else {
+                alert(response.message || 'Login failed');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -85,8 +108,12 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <Button type="submit" className="w-full bg-gray-900 hover:bg-black text-white py-6">
-                            Login
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-gray-900 hover:bg-black text-white py-6"
+                        >
+                            {loading ? 'Logging in...' : 'Login'}
                         </Button>
 
                         <div className="text-center text-sm text-gray-500">

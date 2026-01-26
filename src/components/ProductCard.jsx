@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
 
     return (
         <Card className="group border-none shadow-none hover:shadow-xl transition-all duration-300 overflow-hidden">
-            <Link to={`/product/${product.id}`} className="block relative">
+            <Link to={`/product/${product._id}`} className="block relative">
                 {product.originalPrice && (
                     <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600 text-white border-0 z-10 px-2 py-1">
                         {discount}% OFF
@@ -36,7 +36,7 @@ const ProductCard = ({ product }) => {
             </Link>
             <CardContent className="pt-4 px-2">
                 <p className="text-xs font-medium text-gray-500 mb-1">{product.brand}</p>
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product._id}`}>
                     <h3 className="font-medium text-gray-900 mb-2 truncate group-hover:text-blue-600 transition-colors">
                         {product.name}
                     </h3>

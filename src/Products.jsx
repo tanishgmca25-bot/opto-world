@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductCard from './components/ProductCard';
 import { Button } from './components/ui/button';
 import { Checkbox } from './components/ui/checkbox';
 import { Label } from './components/ui/label';
 import { Slider } from './components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
-import { mockProducts, brands, colors, frameTypes } from './mock/mockData';
+import { productAPI } from './services/api';
 import { Filter, X } from 'lucide-react';
 
 const Products = () => {
+    // State for products
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     // State for filters
-    const [priceRange, setPriceRange] = useState([0, 5000]);
+    const [priceRange, setPriceRange] = useState([0, 10000]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedFrameTypes, setSelectedFrameTypes] = useState([]);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [sortBy, setSortBy] = useState('featured');
+
+    // Fetch products from API
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const response = await productAPI.getAll();
+            if (response.success) {
+                setProducts(response.products);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Extract unique values for filters from products
+    const brands = [...new Set(products.map(p => p.brand))].filter(Boolean);
+    const colors = [...new Set(products.map(p => p.color))].filter(Boolean);
+    const frameTypes = [...new Set(products.map(p => p.frameType))].filter(Boolean);
 
     // Handle filter changes
     const toggleFilter = (item, selected, setSelected) => {
@@ -27,7 +54,7 @@ const Products = () => {
     };
 
     // Filter products
-    const filteredProducts = mockProducts.filter(product => {
+    const filteredProducts = products.filter(product => {
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
         const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
         const matchesColor = selectedColors.length === 0 || selectedColors.includes(product.color);
@@ -39,9 +66,20 @@ const Products = () => {
     const sortedProducts = [...filteredProducts].sort((a, b) => {
         if (sortBy === 'price-low') return a.price - b.price;
         if (sortBy === 'price-high') return b.price - a.price;
-        if (sortBy === 'rating') return b.rating - a.rating;
+        if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
         return 0; // Featured/Default
     });
+
+    if (loading) {
+        return (
+            <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading products...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-gray-50 min-h-screen pb-12">
@@ -91,62 +129,68 @@ const Products = () => {
                             </div>
 
                             {/* Brands */}
-                            <div>
-                                <h3 className="font-semibold mb-4">Brand</h3>
-                                <div className="space-y-3">
-                                    {brands.map(brand => (
-                                        <div key={brand} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={`brand-${brand}`}
-                                                checked={selectedBrands.includes(brand)}
-                                                onChange={() => toggleFilter(brand, selectedBrands, setSelectedBrands)}
-                                            />
-                                            <Label htmlFor={`brand-${brand}`} className="text-sm font-normal cursor-pointer">
-                                                {brand}
-                                            </Label>
-                                        </div>
-                                    ))}
+                            {brands.length > 0 && (
+                                <div>
+                                    <h3 className="font-semibold mb-4">Brand</h3>
+                                    <div className="space-y-3">
+                                        {brands.map(brand => (
+                                            <div key={brand} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`brand-${brand}`}
+                                                    checked={selectedBrands.includes(brand)}
+                                                    onChange={() => toggleFilter(brand, selectedBrands, setSelectedBrands)}
+                                                />
+                                                <Label htmlFor={`brand-${brand}`} className="text-sm font-normal cursor-pointer">
+                                                    {brand}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Frame Type */}
-                            <div>
-                                <h3 className="font-semibold mb-4">Frame Type</h3>
-                                <div className="space-y-3">
-                                    {frameTypes.map(type => (
-                                        <div key={type} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={`type-${type}`}
-                                                checked={selectedFrameTypes.includes(type)}
-                                                onChange={() => toggleFilter(type, selectedFrameTypes, setSelectedFrameTypes)}
-                                            />
-                                            <Label htmlFor={`type-${type}`} className="text-sm font-normal cursor-pointer capitalize">
-                                                {type.replace('-', ' ')}
-                                            </Label>
-                                        </div>
-                                    ))}
+                            {frameTypes.length > 0 && (
+                                <div>
+                                    <h3 className="font-semibold mb-4">Frame Type</h3>
+                                    <div className="space-y-3">
+                                        {frameTypes.map(type => (
+                                            <div key={type} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`type-${type}`}
+                                                    checked={selectedFrameTypes.includes(type)}
+                                                    onChange={() => toggleFilter(type, selectedFrameTypes, setSelectedFrameTypes)}
+                                                />
+                                                <Label htmlFor={`type-${type}`} className="text-sm font-normal cursor-pointer capitalize">
+                                                    {type.replace('-', ' ')}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Colors */}
-                            <div>
-                                <h3 className="font-semibold mb-4">Color</h3>
-                                <div className="space-y-3">
-                                    {colors.map(color => (
-                                        <div key={color} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={`color-${color}`}
-                                                checked={selectedColors.includes(color)}
-                                                onChange={() => toggleFilter(color, selectedColors, setSelectedColors)}
-                                            />
-                                            <div className={`w-4 h-4 rounded-full border border-gray-300`} style={{ backgroundColor: color }}></div>
-                                            <Label htmlFor={`color-${color}`} className="text-sm font-normal cursor-pointer capitalize">
-                                                {color}
-                                            </Label>
-                                        </div>
-                                    ))}
+                            {colors.length > 0 && (
+                                <div>
+                                    <h3 className="font-semibold mb-4">Color</h3>
+                                    <div className="space-y-3">
+                                        {colors.map(color => (
+                                            <div key={color} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`color-${color}`}
+                                                    checked={selectedColors.includes(color)}
+                                                    onChange={() => toggleFilter(color, selectedColors, setSelectedColors)}
+                                                />
+                                                <div className={`w-4 h-4 rounded-full border border-gray-300`} style={{ backgroundColor: color }}></div>
+                                                <Label htmlFor={`color-${color}`} className="text-sm font-normal cursor-pointer capitalize">
+                                                    {color}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
@@ -179,7 +223,7 @@ const Products = () => {
                         {sortedProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {sortedProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product._id} product={product} />
                                 ))}
                             </div>
                         ) : (

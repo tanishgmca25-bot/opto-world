@@ -1,10 +1,62 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, Search, Heart, ShoppingCart, Menu, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, Search, Heart, ShoppingCart, Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userName, setUserName] = useState('');
+    const navigate = useNavigate();
+
+    // Check authentication status
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const name = localStorage.getItem('userName');
+
+        if (token) {
+            setIsLoggedIn(true);
+            setUserName(name || 'User');
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, []);
+
+    // Listen for storage changes (when user logs in/out in another tab)
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const token = localStorage.getItem('token');
+            const name = localStorage.getItem('userName');
+
+            if (token) {
+                setIsLoggedIn(true);
+                setUserName(name || 'User');
+            } else {
+                setIsLoggedIn(false);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // Also listen for custom event when login happens in same tab
+        window.addEventListener('loginStatusChanged', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('loginStatusChanged', handleStorageChange);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        setIsLoggedIn(false);
+        window.dispatchEvent(new Event('loginStatusChanged'));
+        navigate('/');
+        setIsMenuOpen(false);
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
@@ -49,17 +101,39 @@ const Header = () => {
                             </span>
                         </Link>
 
+                        {/* Authentication Buttons */}
                         <div className="flex items-center space-x-2 pl-4 border-l border-gray-200">
-                            <Link to="/login">
-                                <Button variant="ghost" size="sm" className="hidden lg:flex">
-                                    Login
-                                </Button>
-                            </Link>
-                            <Link to="/signup">
-                                <Button size="sm" className="bg-gray-900 hover:bg-gray-800 text-white">
-                                    Sign Up
-                                </Button>
-                            </Link>
+                            {isLoggedIn ? (
+                                <>
+                                    <Link to="/profile">
+                                        <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                                            <User className="h-4 w-4" />
+                                            <span className="hidden lg:inline">{userName}</span>
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleLogout}
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/login">
+                                        <Button variant="ghost" size="sm" className="hidden lg:flex">
+                                            Login
+                                        </Button>
+                                    </Link>
+                                    <Link to="/signup">
+                                        <Button size="sm" className="bg-gray-900 hover:bg-gray-800 text-white">
+                                            Sign Up
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -105,17 +179,40 @@ const Header = () => {
                         >
                             Contact
                         </Link>
+
+                        {/* Mobile Auth Buttons */}
                         <div className="border-t border-gray-100 mt-4 pt-4 flex flex-col space-y-3 px-3">
-                            <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                                <Button variant="outline" className="w-full justify-center">
-                                    Login
-                                </Button>
-                            </Link>
-                            <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                                <Button className="w-full justify-center bg-gray-900">
-                                    Sign Up
-                                </Button>
-                            </Link>
+                            {isLoggedIn ? (
+                                <>
+                                    <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                                        <Button variant="outline" className="w-full justify-center">
+                                            <User className="mr-2 h-4 w-4" />
+                                            {userName}
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        onClick={handleLogout}
+                                        variant="outline"
+                                        className="w-full justify-center text-red-600 hover:bg-red-50 border-red-200"
+                                    >
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        Logout
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                                        <Button variant="outline" className="w-full justify-center">
+                                            Login
+                                        </Button>
+                                    </Link>
+                                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                                        <Button className="w-full justify-center bg-gray-900">
+                                            Sign Up
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

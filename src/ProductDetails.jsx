@@ -1,16 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from './components/ui/button';
-
 import { Badge } from './components/ui/badge';
-import { mockProducts } from './mock/mockData';
+import { productAPI } from './services/api';
 import { Star, Truck, Shield, RotateCcw, Plus, Minus, ShoppingCart, Heart } from 'lucide-react';
 
 const ProductDetails = () => {
     const { id } = useParams();
-    const product = mockProducts.find(p => p.id === id) || mockProducts[0];
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const response = await productAPI.getById(id);
+                if (response.success) {
+                    setProduct(response.product);
+                }
+            } catch (error) {
+                console.error('Error fetching product:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProduct();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading product...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-xl text-gray-600 mb-4">Product not found</p>
+                    <Button onClick={() => window.history.back()}>Go Back</Button>
+                </div>
+            </div>
+        );
+    }
 
     const images = product.images || [product.image];
 
@@ -18,6 +57,11 @@ const ProductDetails = () => {
     const discount = product.originalPrice
         ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
         : 0;
+
+    // Parse features if it's a string
+    const features = typeof product.features === 'string'
+        ? product.features.split(',').map(f => f.trim())
+        : product.features || [];
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -38,24 +82,26 @@ const ProductDetails = () => {
                                     className="max-w-full max-h-full object-contain mix-blend-multiply hover:scale-110 transition-transform duration-500"
                                 />
                             </div>
-                            <div className="grid grid-cols-4 gap-3">
-                                {images.map((img, index) => (
-                                    <div
-                                        key={index}
-                                        onClick={() => setSelectedImage(index)}
-                                        className={`aspect-square rounded-xl bg-white p-2 border cursor-pointer transition-all ${selectedImage === index
-                                            ? 'border-blue-600 ring-2 ring-blue-100'
-                                            : 'border-gray-200 hover:border-blue-300'
-                                            }`}
-                                    >
-                                        <img
-                                            src={img}
-                                            alt={`${product.name} ${index + 1}`}
-                                            className="w-full h-full object-contain mix-blend-multiply"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                            {images.length > 1 && (
+                                <div className="grid grid-cols-4 gap-3">
+                                    {images.map((img, index) => (
+                                        <div
+                                            key={index}
+                                            onClick={() => setSelectedImage(index)}
+                                            className={`aspect-square rounded-xl bg-white p-2 border cursor-pointer transition-all ${selectedImage === index
+                                                ? 'border-blue-600 ring-2 ring-blue-100'
+                                                : 'border-gray-200 hover:border-blue-300'
+                                                }`}
+                                        >
+                                            <img
+                                                src={img}
+                                                alt={`${product.name} ${index + 1}`}
+                                                className="w-full h-full object-contain mix-blend-multiply"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Product Info */}
@@ -73,12 +119,12 @@ const ProductDetails = () => {
                                         {[...Array(5)].map((_, i) => (
                                             <Star
                                                 key={i}
-                                                className={`h-4 w-4 ${i < Math.round(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                                className={`h-4 w-4 ${i < Math.round(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
                                             />
                                         ))}
                                     </div>
                                     <span className="text-gray-500 text-sm">
-                                        {product.rating} ({product.reviews} reviews)
+                                        {product.rating || 0} ({product.reviews || 0} reviews)
                                     </span>
                                 </div>
 
@@ -119,17 +165,19 @@ const ProductDetails = () => {
                                     </div>
                                 </div>
 
-                                <div className="mb-6">
-                                    <h3 className="font-semibold mb-2 text-sm">Key Features</h3>
-                                    <ul className="grid grid-cols-2 gap-2">
-                                        {product.features.map((feature, index) => (
-                                            <li key={index} className="flex items-center text-xs text-gray-600">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2"></div>
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                {features.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="font-semibold mb-2 text-sm">Key Features</h3>
+                                        <ul className="grid grid-cols-2 gap-2">
+                                            {features.map((feature, index) => (
+                                                <li key={index} className="flex items-center text-xs text-gray-600">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2"></div>
+                                                    {feature}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-4 pt-4 border-t border-gray-100">
@@ -153,9 +201,13 @@ const ProductDetails = () => {
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <Button size="lg" className="flex-1 bg-gray-900 hover:bg-black h-11 text-base">
+                                    <Button
+                                        size="lg"
+                                        className="flex-1 bg-gray-900 hover:bg-black h-11 text-base"
+                                        disabled={!product.inStock}
+                                    >
                                         <ShoppingCart className="mr-2 h-4 w-4" />
-                                        Add to Cart
+                                        {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                                     </Button>
                                     <Button size="lg" variant="outline" className="h-11 px-4 border-gray-300">
                                         <Heart className="h-5 w-5 text-gray-600" />

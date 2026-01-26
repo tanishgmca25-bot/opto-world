@@ -8,13 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import { Plus, Trash2, Edit, Package, ShoppingBag, LayoutDashboard, Search } from 'lucide-react';
-import { mockProducts } from './mock/mockData';
+import { productAPI } from './services/api';
 
 const Admin = () => {
     const navigate = useNavigate();
-    const [products, setProducts] = useState(mockProducts);
+    const [products, setProducts] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [imageFile, setImageFile] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         brand: '',
@@ -27,16 +29,31 @@ const Admin = () => {
         description: '',
         features: '',
         image: '',
-        inStock: true
+        inStock: true,
+        stock: 0
     });
 
+    // Fetch products on component mount
     useEffect(() => {
         const userRole = localStorage.getItem('userRole');
         if (userRole !== 'admin') {
             alert('Access denied. Admin only.');
             navigate('/');
+            return;
         }
+        fetchProducts();
     }, [navigate]);
+
+    const fetchProducts = async () => {
+        try {
+            const data = await productAPI.getAll();
+            if (data.success) {
+                setProducts(data.products);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -46,37 +63,60 @@ const Admin = () => {
         });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        const productData = {
-            id: editingProduct ? editingProduct.id : Date.now().toString(),
-            name: formData.name,
-            brand: formData.brand,
-            price: parseFloat(formData.price),
-            originalPrice: parseFloat(formData.originalPrice),
-            category: formData.category,
-            frameType: formData.frameType,
-            color: formData.color,
-            material: formData.material,
-            description: formData.description,
-            features: formData.features.split(',').map(f => f.trim()),
-            image: formData.image,
-            images: [formData.image],
-            inStock: formData.inStock,
-            rating: 4.5,
-            reviews: 0
-        };
-
-        if (editingProduct) {
-            setProducts(products.map(p => p.id === editingProduct.id ? productData : p));
-            alert('Product updated successfully!');
-        } else {
-            setProducts([...products, productData]);
-            alert('Product added successfully!');
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setFormData({
+                ...formData,
+                image: file.name
+            });
         }
+    };
 
-        resetForm();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const productData = {
+                name: formData.name,
+                brand: formData.brand,
+                price: parseFloat(formData.price),
+                originalPrice: parseFloat(formData.originalPrice),
+                category: formData.category,
+                frameType: formData.frameType,
+                color: formData.color,
+                material: formData.material,
+                description: formData.description,
+                features: formData.features,
+                inStock: formData.inStock,
+                stock: parseInt(formData.stock) || 0
+            };
+
+            if (editingProduct) {
+                const response = await productAPI.update(editingProduct._id, productData, imageFile);
+                if (response.success) {
+                    alert('Product updated successfully!');
+                    fetchProducts();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            } else {
+                const response = await productAPI.create(productData, imageFile);
+                if (response.success) {
+                    alert('Product added successfully!');
+                    fetchProducts();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            }
+            resetForm();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleEdit = (product) => {
@@ -93,19 +133,30 @@ const Admin = () => {
             description: product.description,
             features: product.features.join(', '),
             image: product.image,
-            inStock: product.inStock
+            inStock: product.inStock,
+            stock: product.stock ? product.stock.toString() : '0'
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
-            setProducts(products.filter(p => p.id !== id));
-            alert('Product deleted successfully!');
+            try {
+                const response = await productAPI.delete(id);
+                if (response.success) {
+                    alert('Product deleted successfully!');
+                    fetchProducts();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
         }
     };
 
     const resetForm = () => {
         setEditingProduct(null);
+        setImageFile(null);
         setFormData({
             name: '',
             brand: '',
@@ -118,7 +169,8 @@ const Admin = () => {
             description: '',
             features: '',
             image: '',
-            inStock: true
+            inStock: true,
+            stock: 0
         });
     };
 
@@ -226,7 +278,7 @@ const Admin = () => {
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
                                             {filteredProducts.map((product) => (
-                                                <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                                                <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
                                                     <td className="py-4 px-6">
                                                         <div className="flex items-center space-x-4">
                                                             <img
@@ -262,7 +314,7 @@ const Admin = () => {
                                                                 size="sm"
                                                                 variant="destructive"
                                                                 className="h-8 w-8 p-0"
-                                                                onClick={() => handleDelete(product.id)}
+                                                                onClick={() => handleDelete(product._id)}
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
@@ -422,22 +474,24 @@ const Admin = () => {
                                         <h3 className="font-semibold text-gray-900 pb-2 border-b border-gray-100">Details & Media</h3>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="image">Image URL *</Label>
-                                            <div className="flex gap-4">
+                                            <Label htmlFor="image">Product Image *</Label>
+                                            <div className="flex gap-4 items-center">
                                                 <Input
                                                     id="image"
                                                     name="image"
-                                                    value={formData.image}
-                                                    onChange={handleChange}
-                                                    required
-                                                    placeholder="https://example.com/image.jpg"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    className="cursor-pointer"
+                                                    required={!editingProduct}
                                                 />
-                                                {formData.image && (
-                                                    <div className="w-10 h-10 rounded border border-gray-200 overflow-hidden flex-shrink-0">
-                                                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                                                {(imageFile || formData.image) && (
+                                                    <div className="w-12 h-12 rounded border border-gray-200 overflow-hidden flex-shrink-0">
+                                                        <img src={imageFile ? URL.createObjectURL(imageFile) : formData.image} alt="Preview" className="w-full h-full object-cover" />
                                                     </div>
                                                 )}
                                             </div>
+                                            <p className="text-xs text-gray-500">Upload a product image (JPG, PNG, etc.)</p>
                                         </div>
 
                                         <div className="space-y-2">
@@ -465,18 +519,34 @@ const Admin = () => {
                                             />
                                         </div>
 
-                                        <div className="flex items-center space-x-2">
-                                            <input
-                                                type="checkbox"
-                                                id="inStock"
-                                                name="inStock"
-                                                checked={formData.inStock}
-                                                onChange={handleChange}
-                                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                            />
-                                            <Label htmlFor="inStock" className="cursor-pointer">
-                                                Available in Stock
-                                            </Label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="stock">Stock Quantity</Label>
+                                                <Input
+                                                    id="stock"
+                                                    name="stock"
+                                                    type="number"
+                                                    value={formData.stock}
+                                                    onChange={handleChange}
+                                                    placeholder="0"
+                                                    min="0"
+                                                />
+                                            </div>
+                                            <div className="flex items-end">
+                                                <div className="flex items-center space-x-2 w-full">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="inStock"
+                                                        name="inStock"
+                                                        checked={formData.inStock}
+                                                        onChange={handleChange}
+                                                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <Label htmlFor="inStock" className="cursor-pointer">
+                                                        Available in Stock
+                                                    </Label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -486,9 +556,9 @@ const Admin = () => {
                                                 Cancel
                                             </Button>
                                         )}
-                                        <Button type="submit" className="min-w-[150px] bg-blue-600 hover:bg-blue-700">
+                                        <Button type="submit" disabled={loading} className="min-w-[150px] bg-blue-600 hover:bg-blue-700">
                                             <Plus className="h-4 w-4 mr-2" />
-                                            {editingProduct ? 'Update Product' : 'Add Product'}
+                                            {loading ? 'Uploading...' : (editingProduct ? 'Update Product' : 'Add Product')}
                                         </Button>
                                     </div>
                                 </form>
