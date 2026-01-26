@@ -44,7 +44,7 @@ const Home = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=800"
                                     alt="Premium Eyewear"
-                                    className="rounded-3xl shadow-2xl rotate-[-5deg] hover:rotate-0 transition-all duration-500 max-w-[80%] md:max-w-full"
+                                    className="rounded-3xl shadow-2xl"
                                 />
                             </div>
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100 rounded-full blur-3xl opacity-50 -z-10"></div>
