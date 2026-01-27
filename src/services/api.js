@@ -165,3 +165,82 @@ export const reviewAPI = {
     return response.json();
   }
 };
+
+// Booking API calls
+export const bookingAPI = {
+  create: async (bookingData) => {
+    const response = await fetch(`${API_URL}/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
+    });
+    return response.json();
+  },
+
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/bookings`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  updateStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/bookings/${id}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ status })
+    });
+    return response.json();
+  },
+
+  delete: async (id) => {
+    const response = await fetch(`${API_URL}/bookings/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  }
+};
+
+// Contact API calls
+export const contactAPI = {
+  create: async (contactData) => {
+    const response = await fetch(`${API_URL}/contacts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contactData)
+    });
+    return response.json();
+  },
+
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/contacts`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  updateStatus: async (id, status) => {
+    const response = await fetch(`${API_URL}/contacts/${id}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ status })
+    });
+    return response.json();
+  },
+
+  delete: async (id) => {
+    const response = await fetch(`${API_URL}/contacts/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  }
+};
+
