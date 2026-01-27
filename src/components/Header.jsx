@@ -7,16 +7,19 @@ const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState('');
+    const [userRole, setUserRole] = useState('');
     const navigate = useNavigate();
 
     // Check authentication status
     useEffect(() => {
         const token = localStorage.getItem('token');
         const name = localStorage.getItem('userName');
+        const role = localStorage.getItem('userRole');
 
         if (token) {
             setIsLoggedIn(true);
             setUserName(name || 'User');
+            setUserRole(role || 'user');
         } else {
             setIsLoggedIn(false);
         }
@@ -27,10 +30,12 @@ const Header = () => {
         const handleStorageChange = () => {
             const token = localStorage.getItem('token');
             const name = localStorage.getItem('userName');
+            const role = localStorage.getItem('userRole');
 
             if (token) {
                 setIsLoggedIn(true);
                 setUserName(name || 'User');
+                setUserRole(role || 'user');
             } else {
                 setIsLoggedIn(false);
             }
@@ -84,6 +89,11 @@ const Header = () => {
                         <Link to="/contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                             Contact
                         </Link>
+                        {isLoggedIn && userRole === 'admin' && (
+                            <Link to="/admin" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                                Dashboard
+                            </Link>
+                        )}
                     </nav>
 
                     {/* Desktop Actions */}
@@ -179,6 +189,15 @@ const Header = () => {
                         >
                             Contact
                         </Link>
+                        {isLoggedIn && userRole === 'admin' && (
+                            <Link
+                                to="/admin"
+                                className="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Dashboard
+                            </Link>
+                        )}
 
                         {/* Mobile Auth Buttons */}
                         <div className="border-t border-gray-100 mt-4 pt-4 flex flex-col space-y-3 px-3">
