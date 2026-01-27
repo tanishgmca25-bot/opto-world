@@ -16,6 +16,7 @@ const Admin = () => {
     const [bookings, setBookings] = useState([]);
     const [contacts, setContacts] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [activeTab, setActiveTab] = useState('products');
     const [searchTerm, setSearchTerm] = useState('');
     const [bookingSearchTerm, setBookingSearchTerm] = useState('');
     const [contactSearchTerm, setContactSearchTerm] = useState('');
@@ -147,6 +148,27 @@ const Admin = () => {
         }
     };
 
+    const resetForm = () => {
+        setFormData({
+            name: '',
+            brand: '',
+            price: '',
+            originalPrice: '',
+            category: '',
+            frameType: '',
+            color: '',
+            material: '',
+            description: '',
+            features: '',
+            image: '',
+            inStock: true,
+            stock: 0
+        });
+        setEditingProduct(null);
+        setImageFile(null);
+        setActiveTab('products');
+    };
+
     const handleEdit = (product) => {
         setEditingProduct(product);
         setFormData({
@@ -164,6 +186,7 @@ const Admin = () => {
             inStock: product.inStock,
             stock: product.stock ? product.stock.toString() : '0'
         });
+        setActiveTab('add');
     };
 
     const handleDelete = async (id) => {
@@ -180,26 +203,6 @@ const Admin = () => {
                 alert('Error: ' + error.message);
             }
         }
-    };
-
-    const resetForm = () => {
-        setEditingProduct(null);
-        setImageFile(null);
-        setFormData({
-            name: '',
-            brand: '',
-            price: '',
-            originalPrice: '',
-            category: 'eyeglasses',
-            frameType: 'rectangle',
-            color: 'black',
-            material: 'acetate',
-            description: '',
-            features: '',
-            image: '',
-            inStock: true,
-            stock: 0
-        });
     };
 
     const filteredProducts = products.filter(product =>
@@ -368,7 +371,7 @@ const Admin = () => {
                     </Card>
                 </div>
 
-                <Tabs defaultValue="products" className="space-y-6">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <TabsList className="bg-white p-1 border border-gray-100 rounded-lg">
                         <TabsTrigger value="products">Inventory</TabsTrigger>
                         <TabsTrigger value="bookings">Bookings</TabsTrigger>
@@ -633,9 +636,9 @@ const Admin = () => {
                                                         </td>
                                                         <td className="py-4 px-6">
                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${contact.status === 'replied' ? 'bg-green-100 text-green-800' :
-                                                                    contact.status === 'archived' ? 'bg-gray-100 text-gray-800' :
-                                                                        contact.status === 'read' ? 'bg-blue-100 text-blue-800' :
-                                                                            'bg-yellow-100 text-yellow-800'
+                                                                contact.status === 'archived' ? 'bg-gray-100 text-gray-800' :
+                                                                    contact.status === 'read' ? 'bg-blue-100 text-blue-800' :
+                                                                        'bg-yellow-100 text-yellow-800'
                                                                 }`}>
                                                                 {contact.status === 'replied' && <CheckCircle className="h-3 w-3 mr-1" />}
                                                                 {contact.status === 'read' && <Mail className="h-3 w-3 mr-1" />}
