@@ -458,6 +458,7 @@ const Admin = () => {
                                         </tbody>
                                     </table>
                                 </div>
+
                             </CardContent>
                         </Card>
                     </TabsContent>

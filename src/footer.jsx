@@ -61,11 +61,6 @@ const Footer = () => {
                         <h3 className="text-white font-semibold mb-4">Customer Service</h3>
                         <ul className="space-y-2 text-sm">
                             <li>
-                                <Link to="/shipping" className="hover:text-blue-500 transition-colors">
-                                    Shipping & Delivery
-                                </Link>
-                            </li>
-                            <li>
                                 <Link to="/returns" className="hover:text-blue-500 transition-colors">
                                     Returns & Exchanges
                                 </Link>

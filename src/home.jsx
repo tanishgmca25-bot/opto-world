@@ -1,13 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Eye, Shield, Truck, HeadphonesIcon, Star } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import ProductCard from './components/ProductCard';
-import { mockProducts, mockCategories, mockTestimonials } from './mock/mockData';
+import { mockCategories, mockTestimonials } from './mock/mockData';
+import { productAPI } from './services/api';
 
 const Home = () => {
-    const featuredProducts = mockProducts.slice(0, 4);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch products from API
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const response = await productAPI.getAll();
+            if (response.success) {
+                // Get first 4 products for featured section
+                setFeaturedProducts(response.products.slice(0, 4));
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-white">
@@ -90,11 +111,31 @@ const Home = () => {
                             </Button>
                         </Link>
                     </div>
-                    <div className="grid md:grid-cols-4 gap-6">
-                        {featuredProducts.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
+
+                    {loading ? (
+                        <div className="grid md:grid-cols-4 gap-6">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="bg-white rounded-lg p-4 shadow-sm">
+                                    <div className="animate-pulse">
+                                        <div className="bg-gray-200 h-48 rounded-lg mb-4"></div>
+                                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : featuredProducts.length > 0 ? (
+                        <div className="grid md:grid-cols-4 gap-6">
+                            {featuredProducts.map((product) => (
+                                <ProductCard key={product._id} product={product} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                            <p className="text-gray-500">No products available at the moment.</p>
+                        </div>
+                    )}
+
                     <div className="mt-8 text-center md:hidden">
                         <Link to="/products">
                             <Button variant="outline" className="w-full rounded-full">
@@ -123,13 +164,7 @@ const Home = () => {
                             <h3 className="font-bold text-base">100% Authentic</h3>
                             <p className="text-gray-600 text-sm">Guaranteed genuine products</p>
                         </div>
-                        <div className="text-center space-y-3">
-                            <div className="mx-auto w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600">
-                                <Truck className="h-6 w-6" />
-                            </div>
-                            <h3 className="font-bold text-base">Fast Delivery</h3>
-                            <p className="text-gray-600 text-sm">Quick and secure shipping</p>
-                        </div>
+
                         <div className="text-center space-y-3">
                             <div className="mx-auto w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
                                 <HeadphonesIcon className="h-6 w-6" />
