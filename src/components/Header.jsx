@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Search, Heart, ShoppingCart, Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
+import { useCart } from '../contexts/CartContext';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,6 +10,7 @@ const Header = () => {
     const [userName, setUserName] = useState('');
     const [userRole, setUserRole] = useState('');
     const navigate = useNavigate();
+    const { getCartCount } = useCart();
 
     // Check authentication status
     useEffect(() => {
@@ -106,9 +108,11 @@ const Header = () => {
                         </Link>
                         <Link to="/cart" className="text-gray-500 hover:text-blue-600 transition-colors p-1 relative">
                             <ShoppingCart className="h-5 w-5" />
-                            <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
-                                0
-                            </span>
+                            {getCartCount() > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                                    {getCartCount()}
+                                </span>
+                            )}
                         </Link>
 
                         {/* Authentication Buttons */}

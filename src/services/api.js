@@ -244,3 +244,54 @@ export const contactAPI = {
   }
 };
 
+// Cart API calls
+export const cartAPI = {
+  getCart: async () => {
+    const response = await fetch(`${API_URL}/cart`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  addToCart: async (productId, quantity = 1) => {
+    const response = await fetch(`${API_URL}/cart/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ productId, quantity })
+    });
+    return response.json();
+  },
+
+  updateItem: async (productId, quantity) => {
+    const response = await fetch(`${API_URL}/cart/update/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ quantity })
+    });
+    return response.json();
+  },
+
+  removeItem: async (productId) => {
+    const response = await fetch(`${API_URL}/cart/remove/${productId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  clearCart: async () => {
+    const response = await fetch(`${API_URL}/cart/clear`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  }
+};
+
+
