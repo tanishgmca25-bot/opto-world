@@ -197,10 +197,9 @@ export const mockUser = {
 };
 
 export const mockCategories = [
-    { id: 'eyeglasses', name: 'Eyeglasses', icon: '👓' },
+    { id: 'eyeglasses', name: 'Frames', icon: 'frames-icon.png', isImage: true },
     { id: 'sunglasses', name: 'Sunglasses', icon: '🕶️' },
-    { id: 'contact-lenses', name: 'Contact Lenses', icon: '👁️' },
-    { id: 'accessories', name: 'Accessories', icon: '🎒' }
+    { id: 'contact-lenses', name: 'Contact Lenses', icon: '👁️' }
 ];
 
 export const mockTestimonials = [

@@ -7,19 +7,21 @@ import { Textarea } from './components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
-import { Plus, Trash2, Edit, Package, ShoppingBag, LayoutDashboard, Search, Calendar, CheckCircle, XCircle, Clock, Mail, MessageSquare } from 'lucide-react';
-import { productAPI, bookingAPI, contactAPI } from './services/api';
+import { Plus, Trash2, Edit, Package, ShoppingBag, LayoutDashboard, Search, Calendar, CheckCircle, XCircle, Clock, Mail, MessageSquare, Star } from 'lucide-react';
+import { productAPI, bookingAPI, contactAPI, reviewAPI } from './services/api';
 
 const Admin = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [contacts, setContacts] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null);
     const [activeTab, setActiveTab] = useState('products');
     const [searchTerm, setSearchTerm] = useState('');
     const [bookingSearchTerm, setBookingSearchTerm] = useState('');
     const [contactSearchTerm, setContactSearchTerm] = useState('');
+    const [reviewSearchTerm, setReviewSearchTerm] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -49,6 +51,7 @@ const Admin = () => {
         fetchProducts();
         fetchBookings();
         fetchContacts();
+        fetchReviews();
     }, [navigate]);
 
     const fetchProducts = async () => {
@@ -81,6 +84,17 @@ const Admin = () => {
             }
         } catch (error) {
             console.error('Error fetching contacts:', error);
+        }
+    };
+
+    const fetchReviews = async () => {
+        try {
+            const data = await reviewAPI.getAll();
+            if (data.success) {
+                setReviews(data.reviews);
+            }
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
         }
     };
 
@@ -282,6 +296,28 @@ const Admin = () => {
         }
     };
 
+    const handleDeleteReview = async (id) => {
+        if (window.confirm('Are you sure you want to delete this review?')) {
+            try {
+                const response = await reviewAPI.delete(id);
+                if (response.success) {
+                    alert('Review deleted successfully!');
+                    fetchReviews();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    };
+
+    const filteredReviews = reviews.filter(review =>
+        review.user?.name?.toLowerCase().includes(reviewSearchTerm.toLowerCase()) ||
+        review.comment?.toLowerCase().includes(reviewSearchTerm.toLowerCase()) ||
+        review.product?.name?.toLowerCase().includes(reviewSearchTerm.toLowerCase())
+    );
+
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -299,7 +335,7 @@ const Admin = () => {
                 </div>
 
                 {/* Stats */}
-                <div className="grid md:grid-cols-5 gap-6 mb-8">
+                <div className="grid md:grid-cols-6 gap-6 mb-8">
                     <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="pt-6">
                             <div className="flex items-center justify-between">
@@ -369,6 +405,20 @@ const Admin = () => {
                             </div>
                         </CardContent>
                     </Card>
+
+                    <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-gray-500 text-sm font-medium">Total Reviews</p>
+                                    <p className="text-3xl font-bold text-indigo-600 mt-2">{reviews.length}</p>
+                                </div>
+                                <div className="p-4 bg-indigo-50 rounded-xl text-indigo-600">
+                                    <Star className="h-6 w-6" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -376,6 +426,7 @@ const Admin = () => {
                         <TabsTrigger value="products">Inventory</TabsTrigger>
                         <TabsTrigger value="bookings">Bookings</TabsTrigger>
                         <TabsTrigger value="contacts">Contacts</TabsTrigger>
+                        <TabsTrigger value="reviews">Reviews</TabsTrigger>
                         <TabsTrigger value="add">
                             {editingProduct ? 'Edit Product' : 'Add New Product'}
                         </TabsTrigger>
@@ -678,6 +729,93 @@ const Admin = () => {
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </Button>
                                                             </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    {/* Reviews List */}
+                    <TabsContent value="reviews">
+                        <Card className="border-none shadow-sm overflow-hidden">
+                            <CardHeader className="border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between">
+                                <CardTitle>Product Reviews</CardTitle>
+                                <div className="relative w-64">
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                    <Input
+                                        placeholder="Search reviews..."
+                                        className="pl-10 h-9 bg-white"
+                                        value={reviewSearchTerm}
+                                        onChange={(e) => setReviewSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-50/50">
+                                            <tr>
+                                                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                                                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                                                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                                                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rating</th>
+                                                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Comment</th>
+                                                <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {filteredReviews.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="6" className="py-12 text-center text-gray-500">
+                                                        No reviews found
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filteredReviews.map((review) => (
+                                                    <tr key={review._id} className="hover:bg-gray-50/50 transition-colors">
+                                                        <td className="py-4 px-6 text-sm text-gray-600">
+                                                            {new Date(review.createdAt).toLocaleDateString('en-IN', {
+                                                                year: 'numeric',
+                                                                month: 'short',
+                                                                day: 'numeric'
+                                                            })}
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="font-medium text-gray-900">{review.product?.name || 'N/A'}</div>
+                                                            <div className="text-sm text-gray-500">{review.product?.brand || ''}</div>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="font-medium text-gray-900">{review.user?.name || 'Anonymous'}</div>
+                                                            <div className="text-sm text-gray-500">{review.user?.email || ''}</div>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="flex items-center space-x-1">
+                                                                {[...Array(5)].map((_, i) => (
+                                                                    <Star
+                                                                        key={i}
+                                                                        className={`h-4 w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                                                    />
+                                                                ))}
+                                                                <span className="ml-2 text-sm font-medium text-gray-700">({review.rating})</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-6 max-w-md">
+                                                            <p className="text-sm text-gray-600 line-clamp-2">{review.comment}</p>
+                                                        </td>
+                                                        <td className="py-4 px-6 text-right">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="destructive"
+                                                                className="h-8 w-8 p-0"
+                                                                onClick={() => handleDeleteReview(review._id)}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
                                                         </td>
                                                     </tr>
                                                 ))

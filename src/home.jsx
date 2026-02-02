@@ -4,16 +4,19 @@ import { ArrowRight, Eye, Shield, HeadphonesIcon, Star } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import ProductCard from './components/ProductCard';
-import { mockCategories, mockTestimonials } from './mock/mockData';
-import { productAPI } from './services/api';
+import { mockCategories } from './mock/mockData';
+import { productAPI, reviewAPI } from './services/api';
+import framesIcon from './assets/frames-icon.png';
 
 const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch products from API
+    // Fetch products and reviews from API
     useEffect(() => {
         fetchProducts();
+        fetchReviews();
     }, []);
 
     const fetchProducts = async () => {
@@ -27,6 +30,18 @@ const Home = () => {
             console.error('Error fetching products:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchReviews = async () => {
+        try {
+            const response = await reviewAPI.getAll();
+            if (response.success) {
+                // Get the latest 3 reviews for the testimonials section
+                setReviews(response.reviews.slice(0, 3));
+            }
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
         }
     };
 
@@ -77,13 +92,17 @@ const Home = () => {
             {/* Categories */}
             <section className="py-12 bg-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-4 gap-6">
+                    <div className="grid md:grid-cols-3 gap-6">
                         {mockCategories.map((category) => (
                             <Link key={category.id} to={`/products?category=${category.id}`}>
                                 <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border hover:border-blue-200 overflow-hidden h-full">
                                     <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full space-y-3">
                                         <div className="text-4xl transform group-hover:scale-110 transition-transform duration-300">
-                                            {category.icon}
+                                            {category.isImage ? (
+                                                <img src={framesIcon} alt={category.name} className="h-12 w-12 object-contain" />
+                                            ) : (
+                                                category.icon
+                                            )}
                                         </div>
                                         <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
                                             {category.name}
@@ -149,7 +168,7 @@ const Home = () => {
             {/* Features */}
             <section className="py-12 bg-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-4 gap-8">
+                    <div className="grid md:grid-cols-3 gap-8">
                         <div className="text-center space-y-3">
                             <div className="mx-auto w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
                                 <Eye className="h-6 w-6" />
@@ -179,30 +198,34 @@ const Home = () => {
             {/* Testimonials */}
             <section className="py-16 bg-blue-900 text-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-2xl font-bold text-center mb-10">Trusted by thousands of happy customers</h2>
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {mockTestimonials.map((testimonial) => (
-                            <Card key={testimonial.id} className="bg-blue-800 border-none text-white p-5">
-                                <div className="flex items-center space-x-1 mb-3">
-                                    {[...Array(testimonial.rating)].map((_, i) => (
-                                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                    ))}
-                                </div>
-                                <p className="text-blue-100 mb-4 text-base leading-relaxed">"{testimonial.text}"</p>
-                                <div className="flex items-center space-x-3">
-                                    <img
-                                        src={testimonial.avatar}
-                                        alt={testimonial.name}
-                                        className="w-10 h-10 rounded-full border-2 border-blue-400"
-                                    />
-                                    <div>
-                                        <p className="font-bold text-sm">{testimonial.name}</p>
-                                        <p className="text-xs text-blue-300">Verified Customer</p>
+                    <h2 className="text-2xl font-bold text-center mb-10">Trusted by our happy customers</h2>
+                    {reviews.length > 0 ? (
+                        <div className="grid md:grid-cols-3 gap-6">
+                            {reviews.map((review) => (
+                                <Card key={review._id} className="bg-white border-none p-5">
+                                    <div className="flex items-center space-x-1 mb-3">
+                                        {[...Array(review.rating)].map((_, i) => (
+                                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                        ))}
                                     </div>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
+                                    <p className="text-gray-700 mb-4 text-base leading-relaxed">"{review.comment}"</p>
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-10 h-10 rounded-full border-2 border-blue-400 bg-blue-600 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-white font-bold text-sm">{review.user?.name?.charAt(0).toUpperCase()}</span>
+                                        </div>
+                                        <div className="flex flex-col justify-center">
+                                            <p className="font-bold text-sm text-gray-900">{review.user?.name || 'Customer'}</p>
+                                            <p className="text-xs text-blue-600">Verified Customer</p>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-blue-200">
+                            <p>No reviews yet. Be the first to share your experience!</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
