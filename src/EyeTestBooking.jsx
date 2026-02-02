@@ -159,9 +159,6 @@ const EyeTestBooking = () => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="banashankari">Banashankari</SelectItem>
-                                            <SelectItem value="jayanagar">Jayanagar</SelectItem>
-                                            <SelectItem value="koramangala">Koramangala</SelectItem>
-                                            <SelectItem value="indiranagar">Indiranagar</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Search, Heart, ShoppingCart, Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import { productAPI } from '../services/api';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +13,14 @@ const Header = () => {
     const [userRole, setUserRole] = useState('');
     const navigate = useNavigate();
     const { getCartCount } = useCart();
+    const { getWishlistCount } = useWishlist();
+
+    // Search state
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchRef = useRef(null);
 
     // Check authentication status
     useEffect(() => {
@@ -65,9 +75,55 @@ const Header = () => {
         setIsMenuOpen(false);
     };
 
+    // Handle search
+    useEffect(() => {
+        const searchProducts = async () => {
+            if (searchQuery.trim().length < 2) {
+                setSearchResults([]);
+                setShowSearchDropdown(false);
+                return;
+            }
+
+            setIsSearching(true);
+            try {
+                const response = await productAPI.getAll();
+                if (response.success) {
+                    const filtered = response.products.filter(product =>
+                        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        product.brand.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).slice(0, 5); // Limit to 5 results
+                    setSearchResults(filtered);
+                    setShowSearchDropdown(true);
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+            } finally {
+                setIsSearching(false);
+            }
+        };
+
+        const debounceTimer = setTimeout(() => {
+            searchProducts();
+        }, 300);
+
+        return () => clearTimeout(debounceTimer);
+    }, [searchQuery]);
+
+    // Close search dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowSearchDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-2 group">
@@ -99,12 +155,68 @@ const Header = () => {
                     </nav>
 
                     {/* Desktop Actions */}
-                    <div className="hidden md:flex items-center space-x-6">
-                        <button className="text-gray-500 hover:text-blue-600 transition-colors p-1">
-                            <Search className="h-5 w-5" />
-                        </button>
-                        <Link to="/wishlist" className="text-gray-500 hover:text-red-500 transition-colors p-1">
+                    <div className="hidden md:flex items-center space-x-4">
+                        {/* Search */}
+                        <div ref={searchRef} className="relative">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-52 pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-400" />
+                            </div>
+
+                            {/* Search Dropdown */}
+                            {showSearchDropdown && (
+                                <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-auto">
+                                    {isSearching ? (
+                                        <div className="p-6 text-center text-gray-500">
+                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                                        </div>
+                                    ) : searchResults.length > 0 ? (
+                                        <div className="divide-y divide-gray-100">
+                                            {searchResults.map((product) => (
+                                                <Link
+                                                    key={product._id}
+                                                    to={`/product/${product._id}`}
+                                                    onClick={() => {
+                                                        setSearchQuery('');
+                                                        setShowSearchDropdown(false);
+                                                    }}
+                                                    className="flex items-center p-3 hover:bg-gray-50 transition-colors"
+                                                >
+                                                    <img
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        className="w-12 h-12 object-cover rounded"
+                                                    />
+                                                    <div className="ml-3 flex-1 min-w-0">
+                                                        <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                                                        <p className="text-xs text-gray-500">{product.brand}</p>
+                                                    </div>
+                                                    <p className="ml-2 text-sm font-semibold text-gray-900">₹{product.price}</p>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="p-6 text-center text-gray-500">
+                                            No products found
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        <Link to="/wishlist" className="text-gray-500 hover:text-red-500 transition-colors p-1 relative">
                             <Heart className="h-5 w-5" />
+                            {getWishlistCount() > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                                    {getWishlistCount()}
+                                </span>
+                            )}
                         </Link>
                         <Link to="/cart" className="text-gray-500 hover:text-blue-600 transition-colors p-1 relative">
                             <ShoppingCart className="h-5 w-5" />

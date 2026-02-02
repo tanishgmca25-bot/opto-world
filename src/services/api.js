@@ -294,4 +294,37 @@ export const cartAPI = {
   }
 };
 
+// Wishlist API calls
+export const wishlistAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  add: async (productId) => {
+    const response = await fetch(`${API_URL}/wishlist/${productId}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  remove: async (productId) => {
+    const response = await fetch(`${API_URL}/wishlist/${productId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  clear: async () => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  }
+};
 

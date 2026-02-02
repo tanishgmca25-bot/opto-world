@@ -907,6 +907,7 @@ const Admin = () => {
                                                             <SelectContent>
                                                                 <SelectItem value="eyeglasses">Eyeglasses</SelectItem>
                                                                 <SelectItem value="sunglasses">Sunglasses</SelectItem>
+                                                                <SelectItem value="contact-lenses">Contact Lenses</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </div>

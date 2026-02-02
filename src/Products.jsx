@@ -14,6 +14,7 @@ const Products = () => {
     const [loading, setLoading] = useState(true);
 
     // State for filters
+    const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState([0, 10000]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
@@ -55,11 +56,12 @@ const Products = () => {
 
     // Filter products
     const filteredProducts = products.filter(product => {
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
         const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
         const matchesColor = selectedColors.length === 0 || selectedColors.includes(product.color);
         const matchesFrameType = selectedFrameTypes.length === 0 || selectedFrameTypes.includes(product.frameType);
-        return matchesPrice && matchesBrand && matchesColor && matchesFrameType;
+        return matchesCategory && matchesPrice && matchesBrand && matchesColor && matchesFrameType;
     });
 
     // Sort products
@@ -85,9 +87,43 @@ const Products = () => {
         <div className="bg-gray-50 min-h-screen pb-12">
             {/* Header */}
             <div className="bg-white border-b border-gray-200 mb-6">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 text-center md:text-left">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Our Collection</h1>
-                    <p className="text-gray-600 text-sm">Explore our wide range of premium eyewear</p>
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+                    <div className="text-center md:text-left mb-6">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Our Collection</h1>
+                        <p className="text-gray-600 text-sm">Explore our wide range of premium eyewear</p>
+                    </div>
+
+                    {/* Category Filter Buttons */}
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                        <Button
+                            onClick={() => setSelectedCategory('all')}
+                            variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                            className={selectedCategory === 'all' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                        >
+                            All Products
+                        </Button>
+                        <Button
+                            onClick={() => setSelectedCategory('eyeglasses')}
+                            variant={selectedCategory === 'eyeglasses' ? 'default' : 'outline'}
+                            className={selectedCategory === 'eyeglasses' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                        >
+                            Frames
+                        </Button>
+                        <Button
+                            onClick={() => setSelectedCategory('sunglasses')}
+                            variant={selectedCategory === 'sunglasses' ? 'default' : 'outline'}
+                            className={selectedCategory === 'sunglasses' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                        >
+                            Sunglasses
+                        </Button>
+                        <Button
+                            onClick={() => setSelectedCategory('contact-lenses')}
+                            variant={selectedCategory === 'contact-lenses' ? 'default' : 'outline'}
+                            className={selectedCategory === 'contact-lenses' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                        >
+                            Contact Lenses
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -232,6 +268,7 @@ const Products = () => {
                                 <Button
                                     variant="link"
                                     onClick={() => {
+                                        setSelectedCategory('all');
                                         setPriceRange([0, 10000]);
                                         setSelectedBrands([]);
                                         setSelectedColors([]);

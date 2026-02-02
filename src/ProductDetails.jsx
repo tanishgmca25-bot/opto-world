@@ -6,6 +6,7 @@ import { Card, CardContent } from './components/ui/card';
 import { productAPI, reviewAPI } from './services/api';
 import { Star, Truck, Shield, RotateCcw, Plus, Minus, ShoppingCart, Heart, Check, ThumbsUp, MessageSquare } from 'lucide-react';
 import { useCart } from './contexts/CartContext';
+import { useWishlist } from './contexts/WishlistContext';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -15,6 +16,7 @@ const ProductDetails = () => {
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const [isAdding, setIsAdding] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -71,6 +73,20 @@ const ProductDetails = () => {
         if (result.success) {
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 2000);
+        }
+    };
+
+    const handleWishlistToggle = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login', { state: { from: `/product/${id}` } });
+            return;
+        }
+
+        if (isInWishlist(id)) {
+            await removeFromWishlist(id);
+        } else {
+            await addToWishlist(id);
         }
     };
 
@@ -320,8 +336,16 @@ const ProductDetails = () => {
                                             </>
                                         )}
                                     </Button>
-                                    <Button size="lg" variant="outline" className="h-11 px-4 border-gray-300">
-                                        <Heart className="h-5 w-5 text-gray-600" />
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        onClick={handleWishlistToggle}
+                                        className="h-11 px-4 border-gray-300"
+                                    >
+                                        <Heart className={`h-5 w-5 transition-colors ${product && isInWishlist(product._id)
+                                                ? 'fill-red-500 text-red-500'
+                                                : 'text-gray-600'
+                                            }`} />
                                     </Button>
                                 </div>
 

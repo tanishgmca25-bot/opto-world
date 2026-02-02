@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check, Heart } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 
 const ProductCard = ({ product }) => {
     const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+    const navigate = useNavigate();
     const [isAdding, setIsAdding] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+
+    const inWishlist = isInWishlist(product._id);
 
     // Calculate percentage off if original price exists
     const discount = product.originalPrice
@@ -32,6 +37,23 @@ const ProductCard = ({ product }) => {
         }
     };
 
+    const handleWishlistToggle = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        if (inWishlist) {
+            await removeFromWishlist(product._id);
+        } else {
+            await addToWishlist(product._id);
+        }
+    };
+
     return (
         <Card className="group border-none shadow-none hover:shadow-xl transition-all duration-300 overflow-hidden">
             <Link to={`/product/${product._id}`} className="block relative">
@@ -40,6 +62,16 @@ const ProductCard = ({ product }) => {
                         {discount}% OFF
                     </Badge>
                 )}
+                {/* Wishlist Heart Icon */}
+                <button
+                    onClick={handleWishlistToggle}
+                    className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-200 shadow-md"
+                >
+                    <Heart
+                        className={`h-5 w-5 transition-all duration-200 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-500'
+                            }`}
+                    />
+                </button>
                 <div className="aspect-[4/3] overflow-hidden bg-gray-50 relative">
                     <img
                         src={product.image}
