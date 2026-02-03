@@ -41,8 +41,12 @@ const Cart = () => {
     const cartItems = cart?.items || [];
     const isEmpty = cartItems.length === 0;
 
-    const handleQuantityChange = async (productId, newQuantity) => {
+    const handleQuantityChange = async (productId, newQuantity, maxStock) => {
         if (newQuantity < 1) return;
+        if (newQuantity > maxStock) {
+            alert(`Cannot add more items. Only ${maxStock} available in stock.`);
+            return;
+        }
         await updateQuantity(productId, newQuantity);
     };
 
@@ -123,7 +127,7 @@ const Cart = () => {
 
                                             <div className="flex items-center space-x-2 border border-gray-200 rounded-lg">
                                                 <button
-                                                    onClick={() => handleQuantityChange(item.product._id, item.quantity - 1)}
+                                                    onClick={() => handleQuantityChange(item.product._id, item.quantity - 1, item.product.stock)}
                                                     disabled={item.quantity <= 1}
                                                     className="p-2 hover:bg-gray-100 rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
@@ -131,12 +135,19 @@ const Cart = () => {
                                                 </button>
                                                 <span className="px-4 font-medium">{item.quantity}</span>
                                                 <button
-                                                    onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
-                                                    className="p-2 hover:bg-gray-100 rounded-r-lg"
+                                                    onClick={() => handleQuantityChange(item.product._id, item.quantity + 1, item.product.stock)}
+                                                    disabled={item.quantity >= item.product.stock}
+                                                    className="p-2 hover:bg-gray-100 rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    title={item.quantity >= item.product.stock ? `Max stock: ${item.product.stock}` : ''}
                                                 >
                                                     <Plus className="h-4 w-4" />
                                                 </button>
                                             </div>
+
+                                            {/* Stock availability */}
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {item.product.stock > 0 ? `${item.product.stock} available` : 'Out of stock'}
+                                            </p>
 
                                             <p className="text-sm font-semibold text-gray-700">
                                                 ₹{(item.price * item.quantity).toFixed(2)}

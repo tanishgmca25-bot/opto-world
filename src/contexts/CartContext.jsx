@@ -71,10 +71,12 @@ export const CartProvider = ({ children }) => {
                 setCart(response.cart);
                 return { success: true, message: 'Product added to cart!' };
             }
-            return { success: false, message: response.message || 'Failed to add to cart' };
+            return { success: false, error: response.message || 'Failed to add to cart' };
         } catch (error) {
             console.error('Error adding to cart:', error);
-            return { success: false, message: 'Failed to add to cart' };
+            // Extract error message from response
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to add to cart';
+            return { success: false, error: errorMessage };
         }
     };
 

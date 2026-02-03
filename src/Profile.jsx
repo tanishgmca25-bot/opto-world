@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
-import { User, Package, Heart, LogOut, MapPin, Phone, Mail, Edit, Save, X } from 'lucide-react';
+import { User, Package, Heart, LogOut, MapPin, Phone, Mail, Edit, Save, X, Calendar, Clock, CheckCircle, XCircle, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { bookingAPI } from './services/api';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -21,6 +22,8 @@ const Profile = () => {
         phone: '',
         address: ''
     });
+    const [bookings, setBookings] = useState([]);
+    const [loadingBookings, setLoadingBookings] = useState(false);
 
     useEffect(() => {
         // Get user info from localStorage
@@ -49,7 +52,24 @@ const Profile = () => {
             phone: userData.phone,
             address: userData.address
         });
+
+        // Fetch user bookings
+        fetchBookings();
     }, [navigate]);
+
+    const fetchBookings = async () => {
+        setLoadingBookings(true);
+        try {
+            const response = await bookingAPI.getUserBookings();
+            if (response.success) {
+                setBookings(response.bookings);
+            }
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+        } finally {
+            setLoadingBookings(false);
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -266,6 +286,106 @@ const Profile = () => {
                                         Browse Products
                                     </Button>
                                 </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* My Bookings Card */}
+                        <Card className="border-none shadow-sm">
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <CardTitle className="flex items-center gap-2">
+                                    <Calendar className="h-5 w-5 text-blue-600" />
+                                    My Bookings
+                                </CardTitle>
+                                {bookings.filter(b => b.status === 'pending').length > 0 && (
+                                    <div className="flex items-center gap-2 text-orange-600">
+                                        <Bell className="h-4 w-4" />
+                                        <span className="text-sm font-medium">
+                                            {bookings.filter(b => b.status === 'pending').length} pending
+                                        </span>
+                                    </div>
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                {loadingBookings ? (
+                                    <div className="text-center py-12">
+                                        <p className="text-gray-500">Loading bookings...</p>
+                                    </div>
+                                ) : bookings.length === 0 ? (
+                                    <div className="text-center py-12">
+                                        <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                                        <p className="text-gray-500 text-lg mb-2">No bookings yet</p>
+                                        <p className="text-gray-400 text-sm mb-6">Book an eye test to see your appointments here</p>
+                                        <Button onClick={() => navigate('/eye-test-booking')}>
+                                            Book Eye Test
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {bookings.filter(b => b.status === 'confirmed').length > 0 && (
+                                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                                <div className="flex items-center gap-2 text-green-800">
+                                                    <CheckCircle className="h-5 w-5" />
+                                                    <p className="font-semibold">Your booking is confirmed!</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {bookings.map((booking) => (
+                                            <div
+                                                key={booking._id}
+                                                className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                                            >
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-900 capitalize">
+                                                            {booking.testType}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-500">{booking.location}</p>
+                                                    </div>
+                                                    <span
+                                                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${booking.status === 'confirmed'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : booking.status === 'cancelled'
+                                                                    ? 'bg-red-100 text-red-800'
+                                                                    : booking.status === 'completed'
+                                                                        ? 'bg-blue-100 text-blue-800'
+                                                                        : 'bg-yellow-100 text-yellow-800'
+                                                            }`}
+                                                    >
+                                                        {booking.status === 'confirmed' && <CheckCircle className="h-3 w-3 mr-1" />}
+                                                        {booking.status === 'cancelled' && <XCircle className="h-3 w-3 mr-1" />}
+                                                        {booking.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
+                                                        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-2 text-sm text-gray-600">
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar className="h-4 w-4 text-gray-400" />
+                                                        <span>
+                                                            {new Date(booking.preferredDate).toLocaleDateString('en-IN', {
+                                                                weekday: 'long',
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric'
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="h-4 w-4 text-gray-400" />
+                                                        <span>{booking.preferredTime}</span>
+                                                    </div>
+                                                    {booking.notes && (
+                                                        <p className="text-gray-500 italic mt-2">"{booking.notes}"</p>
+                                                    )}
+                                                    {booking.status === 'cancelled' && booking.rejectedReason && (
+                                                        <div className="mt-2 p-2 bg-red-50 rounded text-red-700 text-xs">
+                                                            <strong>Reason:</strong> {booking.rejectedReason}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

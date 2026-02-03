@@ -7,8 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import { Calendar, CheckCircle, AlertCircle } from 'lucide-react';
 import { bookingAPI } from './services/api';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const EyeTestBooking = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -22,6 +25,29 @@ const EyeTestBooking = () => {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+
+    // Check login status and pre-fill user data
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            // Not logged in - redirect to login
+            navigate('/login', { state: { from: '/eye-test-booking' } });
+            return;
+        }
+
+        // Pre-fill user data from localStorage
+        const userName = localStorage.getItem('userName');
+        const userEmail = localStorage.getItem('userEmail');
+        const userPhone = localStorage.getItem('userPhone');
+
+        setFormData(prev => ({
+            ...prev,
+            name: userName || '',
+            email: userEmail || '',
+            phone: userPhone || ''
+        }));
+    }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -84,6 +110,19 @@ const EyeTestBooking = () => {
         setLoading(true);
 
         try {
+            // Check slot availability first
+            const availabilityResponse = await bookingAPI.checkAvailability(
+                formData.preferredDate,
+                formData.preferredTime,
+                formData.location
+            );
+
+            if (!availabilityResponse.available) {
+                setError('This time slot is already booked. Please select another date or time.');
+                setLoading(false);
+                return;
+            }
+
             const response = await bookingAPI.create(formData);
 
             if (response.success) {
@@ -229,7 +268,9 @@ const EyeTestBooking = () => {
                                         onChange={handleChange}
                                         placeholder="Enter your name"
                                         className="h-10"
+                                        readOnly
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">Auto-filled from your profile</p>
                                 </div>
                                 <div className="flex flex-col">
                                     <Label htmlFor="phone" className="text-xs font-medium text-gray-700 mb-2">Phone Number *</Label>
@@ -240,7 +281,9 @@ const EyeTestBooking = () => {
                                         onChange={handleChange}
                                         placeholder="+91 98765 43210"
                                         className="h-10"
+                                        readOnly={!!formData.phone}
                                     />
+                                    {formData.phone && <p className="text-xs text-gray-500 mt-1">Auto-filled from your profile</p>}
                                 </div>
                             </div>
 
@@ -254,7 +297,9 @@ const EyeTestBooking = () => {
                                     onChange={handleChange}
                                     placeholder="your.email@example.com"
                                     className="h-10"
+                                    readOnly
                                 />
+                                <p className="text-xs text-gray-500 mt-1">Auto-filled from your profile</p>
                             </div>
 
                             <div className="flex flex-col mb-6">

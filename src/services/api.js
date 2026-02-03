@@ -171,7 +171,10 @@ export const bookingAPI = {
   create: async (bookingData) => {
     const response = await fetch(`${API_URL}/bookings`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
       body: JSON.stringify(bookingData)
     });
     return response.json();
@@ -181,6 +184,38 @@ export const bookingAPI = {
     const response = await fetch(`${API_URL}/bookings`, {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     });
+    return response.json();
+  },
+
+  getUserBookings: async () => {
+    const response = await fetch(`${API_URL}/bookings/user`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  confirmBooking: async (id) => {
+    const response = await fetch(`${API_URL}/bookings/${id}/confirm`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    return response.json();
+  },
+
+  rejectBooking: async (id, reason) => {
+    const response = await fetch(`${API_URL}/bookings/${id}/reject`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ reason })
+    });
+    return response.json();
+  },
+
+  checkAvailability: async (date, time, location) => {
+    const response = await fetch(`${API_URL}/bookings/check-availability?date=${date}&time=${time}&location=${location}`);
     return response.json();
   },
 
@@ -327,4 +362,5 @@ export const wishlistAPI = {
     return response.json();
   }
 };
+
 

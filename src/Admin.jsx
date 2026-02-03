@@ -266,6 +266,35 @@ const Admin = () => {
         }
     };
 
+    const handleConfirmBooking = async (id) => {
+        try {
+            const response = await bookingAPI.confirmBooking(id);
+            if (response.success) {
+                alert('Booking confirmed successfully!');
+                fetchBookings();
+            } else {
+                alert('Error: ' + response.message);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    };
+
+    const handleRejectBooking = async (id) => {
+        const reason = prompt('Enter reason for rejection (optional):');
+        try {
+            const response = await bookingAPI.rejectBooking(id, reason);
+            if (response.success) {
+                alert('Booking rejected successfully!');
+                fetchBookings();
+            } else {
+                alert('Error: ' + response.message);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    };
+
     const handleUpdateContactStatus = async (id, status) => {
         try {
             const response = await contactAPI.updateStatus(id, status);
@@ -591,14 +620,25 @@ const Admin = () => {
                                                         <td className="py-4 px-6 text-right">
                                                             <div className="flex items-center justify-end space-x-2">
                                                                 {booking.status === 'pending' && (
-                                                                    <Button
-                                                                        size="sm"
-                                                                        variant="outline"
-                                                                        className="h-8 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                                        onClick={() => handleUpdateBookingStatus(booking._id, 'confirmed')}
-                                                                    >
-                                                                        Confirm
-                                                                    </Button>
+                                                                    <>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            className="h-8 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                                            onClick={() => handleConfirmBooking(booking._id)}
+                                                                        >
+                                                                            <CheckCircle className="h-3 w-3 mr-1" />
+                                                                            Confirm
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                                                            onClick={() => handleRejectBooking(booking._id)}
+                                                                        >
+                                                                            <XCircle className="h-3 w-3 mr-1" />
+                                                                            Reject
+                                                                        </Button>
+                                                                    </>
                                                                 )}
                                                                 {booking.status === 'confirmed' && (
                                                                     <Button

@@ -73,6 +73,9 @@ const ProductDetails = () => {
         if (result.success) {
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 2000);
+        } else if (result.error && result.error.includes('stock')) {
+            // Show stock limit error
+            alert(result.error);
         }
     };
 
@@ -295,19 +298,34 @@ const ProductDetails = () => {
                                     <div className="flex items-center border border-gray-200 rounded-md h-9">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="px-2 hover:bg-gray-100 text-gray-600 h-full"
+                                            disabled={quantity <= 1}
+                                            className="px-2 hover:bg-gray-100 text-gray-600 h-full disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <Minus className="h-3 w-3" />
                                         </button>
                                         <span className="w-10 text-center font-medium text-sm">{quantity}</span>
                                         <button
-                                            onClick={() => setQuantity(quantity + 1)}
-                                            className="px-2 hover:bg-gray-100 text-gray-600 h-full"
+                                            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                                            disabled={quantity >= product.stock}
+                                            className="px-2 hover:bg-gray-100 text-gray-600 h-full disabled:opacity-50 disabled:cursor-not-allowed"
+                                            title={quantity >= product.stock ? 'Maximum stock reached' : ''}
                                         >
                                             <Plus className="h-3 w-3" />
                                         </button>
                                     </div>
                                 </div>
+
+                                {/* Stock availability message */}
+                                {product.stock > 0 && product.stock < 10 && (
+                                    <div className="mb-4 text-orange-600 text-sm font-medium">
+                                        ⚠️ Only {product.stock} left in stock!
+                                    </div>
+                                )}
+                                {product.stock === 0 && (
+                                    <div className="mb-4 text-red-600 text-sm font-medium">
+                                        Out of stock
+                                    </div>
+                                )}
 
                                 <div className="flex gap-3">
                                     <Button
@@ -343,8 +361,8 @@ const ProductDetails = () => {
                                         className="h-11 px-4 border-gray-300"
                                     >
                                         <Heart className={`h-5 w-5 transition-colors ${product && isInWishlist(product._id)
-                                                ? 'fill-red-500 text-red-500'
-                                                : 'text-gray-600'
+                                            ? 'fill-red-500 text-red-500'
+                                            : 'text-gray-600'
                                             }`} />
                                     </Button>
                                 </div>
