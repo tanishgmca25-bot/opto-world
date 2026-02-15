@@ -4,6 +4,7 @@ import { ArrowRight, Eye, Shield, HeadphonesIcon, Star } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent } from './components/ui/card';
 import ProductCard from './components/ProductCard';
+import Contact from './Contact';
 import { mockCategories } from './mock/mockData';
 import { productAPI, reviewAPI } from './services/api';
 import framesIcon from './assets/frames-icon.png';
@@ -252,6 +253,9 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Contact Section */}
+            <Contact />
         </div>
     );
 };

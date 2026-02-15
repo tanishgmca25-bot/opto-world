@@ -144,9 +144,6 @@ const Header = () => {
                         <Link to="/eye-test-booking" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                             Book Eye Test
                         </Link>
-                        <Link to="/contact" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                            Contact
-                        </Link>
                         {isLoggedIn && userRole === 'admin' && (
                             <Link to="/admin" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                                 Dashboard
@@ -297,13 +294,6 @@ const Header = () => {
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Book Eye Test
-                        </Link>
-                        <Link
-                            to="/contact"
-                            className="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-md"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            Contact
                         </Link>
                         {isLoggedIn && userRole === 'admin' && (
                             <Link
